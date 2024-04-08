@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+  <div id="app">
+    <div>
+    <el-descriptions class="margin-top" title="产品价格计算表" :column="3" :size="size"  border>
+      <template slot="extra">
+        <el-button type="primary" size="small" @click="pd1">查询单个</el-button>
+        <el-button type="primary" size="small" @click="pd2">查询全部</el-button>
+      </template>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-edit"></i>
+          产品长度/cm
+        </template>
+        <el-input  v-model="long" placeholder="请输入产品长度"></el-input>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-edit"></i>
+          产品宽度/cm
+        </template>
+        <el-input  v-model="wide" placeholder="请输入产品宽度"></el-input>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-edit"></i>
+          产品高度/cm
+        </template>
+        <el-input  v-model="high" placeholder="请输入产品高度"></el-input>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-edit"></i>
+          产品重量/kg
+        </template>
+        <el-input  v-model="weight" placeholder="请输入产品重量"></el-input>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-money"></i>
+          产品采购价格/RMB
+        </template>
+        <el-input  v-model="money" placeholder="请输入产品采购价格"></el-input>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-money"></i>
+          产品定价/PL
+        </template>
+        <el-input  v-model="wantmoney" placeholder="请输入产品定价"></el-input>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-money"></i>
+          产品佣金
+        </template>
+        <el-input  v-model="kickback" placeholder="请输入产品佣金"></el-input>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-truck"></i>
+          物流仓库渠道
+        </template>
+        <el-cascader :options="options" clearable v-model="optionvalue"></el-cascader>
+      </el-descriptions-item>
+    </el-descriptions>
+  </div>
+  <template>
+    <div style="margin-top: -18px;">
+
+    <ul style="font-size: 36px;"> {{ sc }} </ul>
+    <el-table :data="gridData" border stripe height="628"  v-show="dialogTableVisible">
+      <el-table-column property="bg1" label="物流渠道"  :filters="[{ text: '空运', value: '空运' }, { text: '卡航', value: '卡航' }, { text: '铁路', value: '铁路' }]" :filter-method="filter1"></el-table-column>
+      <el-table-column property="bg2" label="仓库渠道"  :filters="[{ text: '百分仓', value: '百分仓' }, { text: '官方仓', value: '官方仓' }]" :filter-method="filter2"></el-table-column>
+      <el-table-column property="bg3" label="快递方式"  
+      :filters="[{ text: 'InPost', value: 'INPOST' }, { text: 'DPD', value: 'DPD' }, { text: 'UPS', value: 'UPS' }, { text: 'DHL', value: 'DHL' }, { text: 'GLS', value: 'GLS' }, { text: 'Allegro One', value: 'One' }]" 
+      :filter-method="filter3"></el-table-column>
+      <el-table-column property="bg4" label="成本定价"  sortable></el-table-column>
+      <el-table-column property="bg5" label="利润"     sortable></el-table-column>
+      <el-table-column property="bg6" label="利润率"   sortable></el-table-column>
+    </el-table>
+
+
+  </div>
+  </template>
+</body>
+  <!-- import Vue before Element -->
+  <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: function() {
+        return { 
+          size: '',
+          dialogTableVisible: false,
+          gridData: [],
+          money: '',
+          wantmoney: '',
+          long: '',
+          wide: '',
+          weight: '',
+          high: '',
+          kickback: '',
+          cb: null,
+          lr: null,
+          lrl: null,
+          sc:'',
+          cs:'',
+          optionall:
+                [
+          [
+              "ky",
+              "bfc_ky1",
+              "InPost_kyb1"
+          ],
+          [
+              "ky",
+              "bfc_ky1",
+              "DPD_kyb1"
+          ],
+          [
+              "ky",
+              "bfc_ky1",
+              "UPS_kyb1"
+          ],
+          [
+              "ky",
+              "bfc_ky1",
+              "GLS_kyb1"
+          ],
+          [
+              "ky",
+              "bfc_ky1",
+              "DHL_kyb1"
+          ],
+          [
+              "ky",
+              "bfc_ky1",
+              "One_kyb1"
+          ],
+          [
+              "ky",
+              "bfc_ky2",
+              "InPost_kyb2"
+          ],
+          [
+              "ky",
+              "bfc_ky2",
+              "DPD_kyb2"
+          ],
+          [
+              "ky",
+              "bfc_ky2",
+              "UPS_kyb2"
+          ],
+          [
+              "ky",
+              "bfc_ky2",
+              "GLS_kyb2"
+          ],
+          [
+              "ky",
+              "bfc_ky2",
+              "DHL_kyb2"
+          ],
+          [
+              "ky",
+              "bfc_ky2",
+              "One_kyb2"
+          ],
+          [
+              "ky",
+              "gfc_ky1",
+              "InPost_kyg1"
+          ],
+          [
+              "ky",
+              "gfc_ky1",
+              "DPD_kyg1"
+          ],
+          [
+              "ky",
+              "gfc_ky1",
+              "UPS_kyg1"
+          ],
+          [
+              "ky",
+              "gfc_ky1",
+              "GLS_kyg1"
+          ],
+          [
+              "ky",
+              "gfc_ky1",
+              "DHL_kyg1"
+          ],
+          [
+              "ky",
+              "gfc_ky1",
+              "One_kyg1"
+          ],
+          [
+              "ky",
+              "gfc_ky2",
+              "InPost_kyg2"
+          ],
+          [
+              "ky",
+              "gfc_ky2",
+              "DPD_kyg2"
+          ],
+          [
+              "ky",
+              "gfc_ky2",
+              "UPS_kyg2"
+          ],
+          [
+              "ky",
+              "gfc_ky2",
+              "GLS_kyg2"
+          ],
+          [
+              "ky",
+              "gfc_ky2",
+              "DHL_kyg2"
+          ],
+          [
+              "ky",
+              "gfc_ky2",
+              "One_kyg2"
+          ],
+          [
+              "kh",
+              "bfc_kh1",
+              "InPost_khb1"
+          ],
+          [
+              "kh",
+              "bfc_kh1",
+              "DPD_khb1"
+          ],
+          [
+              "kh",
+              "bfc_kh1",
+              "UPS_khb1"
+          ],
+          [
+              "kh",
+              "bfc_kh1",
+              "GLS_khb1"
+          ],
+          [
+              "kh",
+              "bfc_kh1",
+              "DHL_khb1"
+          ],
+          [
+              "kh",
+              "bfc_kh1",
+              "One_khb1"
+          ],
+          [
+              "kh",
+              "bfc_kh2",
+              "InPost_khb2"
+          ],
+          [
+              "kh",
+              "bfc_kh2",
+              "DPD_khb2"
+          ],
+          [
+              "kh",
+              "bfc_kh2",
+              "UPS_khb2"
+          ],
+          [
+              "kh",
+              "bfc_kh2",
+              "GLS_khb2"
+          ],
+          [
+              "kh",
+              "bfc_kh2",
+              "DHL_khb2"
+          ],
+          [
+              "kh",
+              "bfc_kh2",
+              "One_khb2"
+          ],
+          [
+              "kh",
+              "gfc_kh1",
+              "InPost_khg1"
+          ],
+          [
+              "kh",
+              "gfc_kh1",
+              "DPD_khg1"
+          ],
+          [
+              "kh",
+              "gfc_kh1",
+              "UPS_khg1"
+          ],
+          [
+              "kh",
+              "gfc_kh1",
+              "GLS_khg1"
+          ],
+          [
+              "kh",
+              "gfc_kh1",
+              "DHL_khg1"
+          ],
+          [
+              "kh",
+              "gfc_kh1",
+              "One_khg1"
+          ],
+          [
+              "kh",
+              "gfc_kh2",
+              "InPost_khg2"
+          ],
+          [
+              "kh",
+              "gfc_kh2",
+              "DPD_khg2"
+          ],
+          [
+              "kh",
+              "gfc_kh2",
+              "UPS_khg2"
+          ],
+          [
+              "kh",
+              "gfc_kh2",
+              "GLS_khg2"
+          ],
+          [
+              "kh",
+              "gfc_kh2",
+              "DHL_khg2"
+          ],
+          [
+              "kh",
+              "gfc_kh2",
+              "One_khg2"
+          ],
+          [
+              "tl",
+              "bfc_tl1",
+              "InPost_tlb1"
+          ],
+          [
+              "tl",
+              "bfc_tl1",
+              "DPD_tlb1"
+          ],
+          [
+              "tl",
+              "bfc_tl1",
+              "UPS_tlb1"
+          ],
+          [
+              "tl",
+              "bfc_tl1",
+              "GLS_tlb1"
+          ],
+          [
+              "tl",
+              "bfc_tl1",
+              "DHL_tlb1"
+          ],
+          [
+              "tl",
+              "bfc_tl1",
+              "One_tlb1"
+          ],
+          [
+              "tl",
+              "bfc_tl2",
+              "InPost_tlb2"
+          ],
+          [
+              "tl",
+              "bfc_tl2",
+              "DPD_tlb2"
+          ],
+          [
+              "tl",
+              "bfc_tl2",
+              "UPS_tlb2"
+          ],
+          [
+              "tl",
+              "bfc_tl2",
+              "GLS_tlb2"
+          ],
+          [
+              "tl",
+              "bfc_tl2",
+              "DHL_tlb2"
+          ],
+          [
+              "tl",
+              "bfc_tl2",
+              "One_tlb2"
+          ],
+          [
+              "tl",
+              "gfc_tl1",
+              "InPost_tlg1"
+          ],
+          [
+              "tl",
+              "gfc_tl1",
+              "DPD_tlg1"
+          ],
+          [
+              "tl",
+              "gfc_tl1",
+              "UPS_tlg1"
+          ],
+          [
+              "tl",
+              "gfc_tl1",
+              "GLS_tlg1"
+          ],
+          [
+              "tl",
+              "gfc_tl1",
+              "DHL_tlg1"
+          ],
+          [
+              "tl",
+              "gfc_tl1",
+              "One_tlg1"
+          ],
+          [
+              "tl",
+              "gfc_tl2",
+              "InPost_tlg2"
+          ],
+          [
+              "tl",
+              "gfc_tl2",
+              "DPD_tlg2"
+          ],
+          [
+              "tl",
+              "gfc_tl2",
+              "UPS_tlg2"
+          ],
+          [
+              "tl",
+              "gfc_tl2",
+              "GLS_tlg2"
+          ],
+          [
+              "tl",
+              "gfc_tl2",
+              "DHL_tlg2"
+          ],
+          [
+              "tl",
+              "gfc_tl2",
+              "One_tlg2"
+          ]
+      ],
+          optionvalue:[[
+                  "ky666",
+                  "bfc_ky1",
+                  "InPost_kyb1"
+              ]],
+          options: [{
+          value: 'ky',
+          label: '空运',
+          children: [{
+            value: 'bfc_ky1',
+            label: '百分仓库smart',
+            children: [{
+              value: 'InPost_kyb1',
+              label: 'InPost'
+            }, {
+              value: 'DPD_kyb1',
+              label: 'DPD'
+            }, {
+              value: 'UPS_kyb1',
+              label: 'UPS'
+            }, {
+              value: 'GLS_kyb1',
+              label: 'GLS'
+            }, {
+              value: 'DHL_kyb1',
+              label: 'DHL'
+            },{
+              value: 'One_kyb1',
+              label: 'Allegro One'
+            }
+          ]},{
+            value: 'bfc_ky2',
+            label: '百分仓库非smart',
+            children: [{
+              value: 'InPost_kyb2',
+              label: 'InPost'
+            }, {
+              value: 'DPD_kyb2',
+              label: 'DPD'
+            }, {
+              value: 'UPS_kyb2',
+              label: 'UPS'
+            }, {
+              value: 'GLS_kyb2',
+              label: 'GLS'
+            }, {
+              value: 'DHL_kyb2',
+              label: 'DHL'
+            },{
+              value: 'One_kyb2',
+              label: 'Allegro One'
+            }
+          ]}, {
+            value: 'gfc_ky1',
+            label: '官方仓库smart',
+            children: [{
+              value: 'InPost_kyg1',
+              label: 'InPost'
+            }, {
+              value: 'DPD_kyg1',
+              label: 'DPD'
+            }, {
+              value: 'UPS_kyg1',
+              label: 'UPS'
+            }, {
+              value: 'GLS_kyg1',
+              label: 'GLS'
+            }, {
+              value: 'DHL_kyg1',
+              label: 'DHL'
+            },{
+              value: 'One_kyg1',
+              label: 'Allegro One'
+            }
+          ]
+          }, {
+            value: 'gfc_ky2',
+            label: '官方仓库非smart',
+            children: [{
+              value: 'InPost_kyg2',
+              label: 'InPost'
+            }, {
+              value: 'DPD_kyg2',
+              label: 'DPD'
+            }, {
+              value: 'UPS_kyg2',
+              label: 'UPS'
+            }, {
+              value: 'GLS_kyg2',
+              label: 'GLS'
+            }, {
+              value: 'DHL_kyg2',
+              label: 'DHL'
+            },{
+              value: 'One_kyg2',
+              label: 'Allegro One'
+            }
+          ]
+          }
+        ]
+        }, {
+          value: 'kh',
+          label: '卡航',
+          children: [{
+            value: 'bfc_kh1',
+            label: '百分仓库smart',
+            children: [{
+              value: 'InPost_khb1',
+              label: 'InPost'
+            }, {
+              value: 'DPD_khb1',
+              label: 'DPD'
+            }, {
+              value: 'UPS_khb1',
+              label: 'UPS'
+            }, {
+              value: 'GLS_khb1',
+              label: 'GLS'
+            }, {
+              value: 'DHL_khb1',
+              label: 'DHL'
+            },{
+              value: 'One_khb1',
+              label: 'Allegro One'
+            }
+          ]},{
+            value: 'bfc_kh2',
+            label: '百分仓库非smart',
+            children: [{
+              value: 'InPost_khb2',
+              label: 'InPost'
+            }, {
+              value: 'DPD_khb2',
+              label: 'DPD'
+            }, {
+              value: 'UPS_khb2',
+              label: 'UPS'
+            }, {
+              value: 'GLS_khb2',
+              label: 'GLS'
+            }, {
+              value: 'DHL_khb2',
+              label: 'DHL'
+            },{
+              value: 'One_khb2',
+              label: 'Allegro One'
+            }
+          ]}, {
+            value: 'gfc_kh1',
+            label: '官方仓库smart',
+            children: [{
+              value: 'InPost_khg1',
+              label: 'InPost'
+            }, {
+              value: 'DPD_khg1',
+              label: 'DPD'
+            }, {
+              value: 'UPS_khg1',
+              label: 'UPS'
+            }, {
+              value: 'GLS_khg1',
+              label: 'GLS'
+            }, {
+              value: 'DHL_khg1',
+              label: 'DHL'
+            },{
+              value: 'One_khg1',
+              label: 'Allegro One'
+            }]
+          }, {
+            value: 'gfc_kh2',
+            label: '官方仓库非smart',
+            children: [{
+              value: 'InPost_khg2',
+              label: 'InPost'
+            }, {
+              value: 'DPD_khg2',
+              label: 'DPD'
+            }, {
+              value: 'UPS_khg2',
+              label: 'UPS'
+            }, {
+              value: 'GLS_khg2',
+              label: 'GLS'
+            }, {
+              value: 'DHL_khg2',
+              label: 'DHL'
+            },{
+              value: 'One_khg2',
+              label: 'Allegro One'
+            }]
+          }
+        ]
+        }, {
+          value: 'tl',
+          label: '铁路',
+          children: [{
+            value: 'bfc_tl1',
+            label: '百分仓库smart',
+            children: [{
+              value: 'InPost_tlb1',
+              label: 'InPost'
+            }, {
+              value: 'DPD_tlb1',
+              label: 'DPD'
+            }, {
+              value: 'UPS_tlb1',
+              label: 'UPS'
+            }, {
+              value: 'GLS_tlb1',
+              label: 'GLS'
+            }, {
+              value: 'DHL_tlb1',
+              label: 'DHL'
+            },{
+              value: 'One_tlb1',
+              label: 'Allegro One'
+            }
+          ]},{
+            value: 'bfc_tl2',
+            label: '百分仓库非smart',
+            children: [{
+              value: 'InPost_tlb2',
+              label: 'InPost'
+            }, {
+              value: 'DPD_tlb2',
+              label: 'DPD'
+            }, {
+              value: 'UPS_tlb2',
+              label: 'UPS'
+            }, {
+              value: 'GLS_tlb2',
+              label: 'GLS'
+            }, {
+              value: 'DHL_tlb2',
+              label: 'DHL'
+            },{
+              value: 'One_tlb2',
+              label: 'Allegro One'
+            }
+          ]}, {
+            value: 'gfc_tl1',
+            label: '官方仓库smart',
+            children: [{
+              value: 'InPost_tlg1',
+              label: 'InPost'
+            }, {
+              value: 'DPD_tlg1',
+              label: 'DPD'
+            }, {
+              value: 'UPS_tlg1',
+              label: 'UPS'
+            }, {
+              value: 'GLS_tlg1',
+              label: 'GLS'
+            }, {
+              value: 'DHL_tlg1',
+              label: 'DHL'
+            },{
+              value: 'One_tlg1',
+              label: 'Allegro One'
+            }]
+          }, {
+            value: 'gfc_tl2',
+            label: '官方仓库非smart',
+            children: [{
+              value: 'InPost_tlg2',
+              label: 'InPost'
+            }, {
+              value: 'DPD_tlg2',
+              label: 'DPD'
+            }, {
+              value: 'UPS_tlg2',
+              label: 'UPS'
+            }, {
+              value: 'GLS_tlg2',
+              label: 'GLS'
+            }, {
+              value: 'DHL_tlg2',
+              label: 'DHL'
+            },{
+              value: 'One_tlg2',
+              label: 'Allegro One'
+            }]
+          }
+        ]
+        }]
+ }},
+  computed: {
+    
+  },
+    methods: {
+      filter1(value, row) {
+        return row.bg1 === value;
+      },
+      filter2(value, row) {
+        console.log((row.bg2).substr(0, 3))
+        return (row.bg2).substr(0, 3) == value;
+      },
+      filter3(value, row) {
+        return row.bg3 === value;
+      },
+      pd1(){
+       this.dialogTableVisible=false
+      //判断是否能放入inpost储物柜
+      if(this.optionvalue.length!=3||this.money==''||this.wantmoney==''||this.long==''||this.wide==''||this.weight==''||this.high==''||this.kickback==''){
+          alert('请将数据填写完整')
+        }else{
+          this.cx()
+        }
+      },
+      pd2(){
+        if(this.money==''||this.wantmoney==''||this.long==''||this.wide==''||this.weight==''||this.high==''||this.kickback==''){
+          alert('请将数据填写完整')
+        }else{
+          this.cxqb()
+        }
+      },
+      cxqb(){
+        this.dialogTableVisible = true
+        let a1 = this.optionvalue[0]
+        let b1 = this.optionvalue[1]
+        let c1 = this.optionvalue[2]
+        this.optionall.forEach(item => {
+        this.optionvalue[0]=item[0]
+        this.optionvalue[1]=item[1]
+        this.optionvalue[2]=item[2]
+       //计算实际计费重量
+       let a = this.long*this.wide*this.high/6000
+        let b = this.weight
+        let c = 0
+        if(a>b){
+        c = a
+        }else if(a<=b){
+        c = b
+        }
+      //计算头程
+      //运输方式        this.optionvalue[0]
+      //仓库+是否smart  this.optionvalue[1]
+      //物流渠道        this.optionvalue[2]
+        let tc = 0
+      if(this.optionvalue[0]=='ky'){
+        tc = 50*c 
+      }else if(this.optionvalue[0]=='kh'){
+        tc = 30*c 
+      }else if(this.optionvalue[0]=='tl'){
+        tc = 20*c
+      }
+      //计算上架费
+       let sjf = 0 
+      if(c<1){
+        sjf = 0.2
+      }else if(1<=c&&c<2){
+        sjf = 0.5
+      }else if(2<=c&&c<5){
+        sjf = 1
+      }else if(5<=c&&c<10){
+        sjf = 1.6
+      }else if(10<=c&&c<15){
+        sjf = 2.2
+      }else if(15<=c&&c<20){
+        sjf = 2.8
+      }else if(20<=c&&c<30){
+        sjf = 3.6
+      }else if(30<=c&&c<40){
+        sjf = 4.6
+      }else if(40<c){
+        sjf = 6
+      }
+      //拣货费固定0.2
+      let jhf = 0
+      if(c<1){
+        jhf = 0.2
+      }else if(1<=c&&c<2){
+        jhf = 0.5
+      }else if(2<=c&&c<3){
+        jhf = 0.8
+      }else if(3<=c&&c<4){
+        jhf = 1.2
+      }else if(4<=c&&c<5){
+        jhf = 1.6
+      }else if(5<=c){
+        jhf = 2
+      }
+      //计算贴标费
+      let tbf = 0.2
+      if(this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+          tbf = 0
+      }
+      //计算物料费
+      let wlf = 0 
+      if(c<0.2){
+        wlf = 0.3
+      }else if(0.2<=c&&c<1){
+        wlf = 0.5
+      }else if(1<=c&&c<2){
+        wlf = 1
+      }else if(2<=c&&c<5){
+        wlf = 1.5
+      }else if(5<=c&&c<10){
+        wlf = 2
+      }else if(10<=c&&c<20){
+        wlf = 2.5
+      }else if(20<=c&&c<31.5){
+        wlf = 3
+      }
+    //计算百分仓非smart商品运费
+    let spyf = 0
+      let big = 0
+      let mid = 0
+      let small = 0
+      this.long=Number(this.long)
+      this.wide=Number(this.wide)
+      this.high=Number(this.high)
+      if(this.long>=this.wide&&this.long>=this.high){
+          big = this.long
+          if(this.wide>=this.high){
+            mid=this.wide
+            small=this.high
+          }else{
+            mid=this.high
+            small=this.wide
+          }
+        }else if(this.wide>=this.long&&this.wide>=this.high){
+          big = this.wide
+          if(this.long>=this.high){
+            mid=this.long
+            small=this.high
+          }else{
+            mid=this.high
+            small=this.long
+          }
+        }else{
+          big = this.high
+          if(this.long>=this.wide){
+            mid=this.long
+            small=this.wide
+          }else{
+            mid=this.wide
+            small=this.long
+          }
+        }
+      if (this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+        if(mid<=38&&small>0&&small<=8){
+          spyf=3.1
+        }else if(mid<=38&&small>8&&small<=19){
+          spyf=3.25
+        }else{
+          spyf=3.75
+        }
+      }
+      if (this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'){
+        if(0<c&&c<=2){
+          spyf=4
+        }else if(2<c&&c<=5){
+          spyf=4.3
+        }else if(5<c&&c<=10){
+          spyf=4.6
+        }else if(10<c&&c<=15){
+          spyf=5
+        }else if(15<c&&c<=20){
+          spyf=5.55
+        }else if(20<c&&c<=31.5){
+          spyf=6.1
+        }else if(31.5<c&&c<=40){
+          spyf=31.5
+        }
+      }
+      if (this.optionvalue[2]=='DHL_kyb2'||this.optionvalue[2]=='DHL_khb2'||this.optionvalue[2]=='DHL_khb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      if (this.optionvalue[2]=='DPD_kyb2'||this.optionvalue[2]=='DPD_khb2'||this.optionvalue[2]=='DPD_khb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      if (this.optionvalue[2]=='UPS_kyb2'||this.optionvalue[2]=='UPS_khb2'||this.optionvalue[2]=='UPS_khb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      if (this.optionvalue[2]=='One_kyb2'||this.optionvalue[2]=='One_khb2'||this.optionvalue[2]=='One_khb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      let gfc_ckfy=0
+      let lfm=this.long*this.wide*this.high/1000000
+
+      if (0<lfm&&lfm<0.0003){
+        gfc_ckfy=3.06
+      }else if(0.0003<lfm&&lfm<=0.001){
+        gfc_ckfy=4.91
+      }else if(0.001<lfm&&lfm<=0.003){
+        gfc_ckfy=6.14
+      }else if(0.003<lfm&&lfm<=0.015){
+        gfc_ckfy=8.6
+      }else if(0.015<lfm&&lfm<=0.031){
+        gfc_ckfy=9.83
+      }else if(0.031<lfm&&lfm<=0.0768){
+        gfc_ckfy=12.9
+      }
+
+      let gfc_spyf=0
+      if (this.optionvalue[2]=='InPost_kyg2'||this.optionvalue[2]=='InPost_khg2'||this.optionvalue[2]=='InPost_tlg2'){
+        gfc_spyf=10.95
+      }
+      if (this.optionvalue[2]=='GLS_kyg2'||this.optionvalue[2]=='GLS_khg2'||this.optionvalue[2]=='GLS_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='DHL_kyg2'||this.optionvalue[2]=='DHL_khg2'||this.optionvalue[2]=='DHL_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='DPD_kyg2'||this.optionvalue[2]=='DPD_khg2'||this.optionvalue[2]=='DPD_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='UPS_kyg2'||this.optionvalue[2]=='UPS_khg2'||this.optionvalue[2]=='UPS_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='Onekyg2'||this.optionvalue[2]=='One_khg2'||this.optionvalue[2]=='One_tlg2'){
+        gfc_spyf=9.99
+      }
+      let mdfy = 0
+      if(this.optionvalue[2]=='InPost_kyg1'||this.optionvalue[2]=='InPost_khg1'||this.optionvalue[2]=='InPost_tlg1'||this.optionvalue[2]=='InPost_kyb1'||this.optionvalue[2]=='InPost_khb1'||this.optionvalue[2]=='InPost_tlb1'){
+          if(this.wantmoney>=40&&this.wantmoney<50){
+          mdfy=1.59
+        }
+        else if(this.wantmoney>=50&&this.wantmoney<60){
+          mdfy=2.09
+        }
+        else if(this.wantmoney>=60&&this.wantmoney<80){   
+          mdfy=2.89
+        }else if(this.wantmoney>=80&&this.wantmoney<120){
+          mdfy=3.99
+        }else if(this.wantmoney>=120&&this.wantmoney<200){
+          mdfy=6.69
+        }else if(200<=this.wantmoney){
+          mdfy=8.69
+        }
+      }
+        if(this.optionvalue[2]=='DPD_kyg1'||this.optionvalue[2]=='DPD_khg1'||this.optionvalue[2]=='DPD_tlg1'||this.optionvalue[2]=='DPD_kyb1'||this.optionvalue[2]=='DPD_khb1'||this.optionvalue[2]=='DPD_tlb1'
+        ||this.optionvalue[2]=='DHL_kyg1'||this.optionvalue[2]=='DHL_khg1'||this.optionvalue[2]=='DHL_tlg1'||this.optionvalue[2]=='DHL_kyb1'||this.optionvalue[2]=='DHL_khb1'||this.optionvalue[2]=='DHL_tlb1'
+        ||this.optionvalue[2]=='GLS_kyg1'||this.optionvalue[2]=='GLS_khg1'||this.optionvalue[2]=='GLS_tlg1'||this.optionvalue[2]=='GLS_kyb1'||this.optionvalue[2]=='GLS_khb1'||this.optionvalue[2]=='GLS_tlb1'
+        ||this.optionvalue[2]=='UPS_kyg1'||this.optionvalue[2]=='UPS_khg1'||this.optionvalue[2]=='UPS_tlg1'||this.optionvalue[2]=='UPS_kyb1'||this.optionvalue[2]=='UPS_khb1'||this.optionvalue[2]=='UPS_tlb1'){
+        if(40<=this.wantmoney&&this.wantmoney<80){ 
+          mdfy=3.49
+        }else if(80<=this.wantmoney&&this.wantmoney<120){
+          mdfy=5.09
+        }
+        else if(120<=this.wantmoney&&this.wantmoney<200){
+          mdfy=8.69
+        }else if(200<=this.wantmoney){
+          mdfy=11.49
+        }
+      }
+      if(this.optionvalue[2]=='One_kyg1'||this.optionvalue[2]=='One_khg1'||this.optionvalue[2]=='One_tlg1'||this.optionvalue[2]=='One_kyb1'||this.optionvalue[2]=='One_khb1'||this.optionvalue[2]=='One_tlb1'){
+        if(40<=this.wantmoney&&this.wantmoney<49.99){ 
+          mdfy=1.29
+        }else if(50<=this.wantmoney&&this.wantmoney<59.99){
+          mdfy=1.69
+        }else if(60<=this.wantmoney&&this.wantmoney<79.99){
+          mdfy=2.29
+        }else if(80<=this.wantmoney&&this.wantmoney<119.99){
+          mdfy=3.29
+        }else if(120<=this.wantmoney&&this.wantmoney<199.99){
+          mdfy=5.99
+        }else if(200<=this.wantmoney){
+          mdfy=6.49
+        }
+      }
+      //成本定价 波兰币
+      this.cb = 0
+      if(this.optionvalue[1]=='bfc_ky1'||this.optionvalue[1]=='bfc_ky2'||this.optionvalue[1]=='bfc_kh1'||this.optionvalue[1]=='bfc_kh2'||this.optionvalue[1]=='bfc_tl1'||this.optionvalue[1]=='bfc_tl2'){
+        this.cb = (Number(this.money)+Number(tc)+(Number(sjf)+Number(jhf)+0.2+Number(wlf)+Number(spyf))*7.5)/(1-0.187-Number(this.kickback))/1.45+mdfy
+      }
+      else  if(this.optionvalue[1]=='gfc_ky1'||this.optionvalue[1]=='gfc_ky2'||this.optionvalue[1]=='gfc_kh1'||this.optionvalue[1]=='gfc_kh2'||this.optionvalue[1]=='gfc_tl1'||this.optionvalue[1]=='gfc_tl2'){
+        this.cb = (Number(this.money)+Number(tc)+(Number(gfc_ckfy)+gfc_spyf)*1.45)/(1-0.187-Number(this.kickback))/1.45+mdfy
+      }
+      //利润 人民币
+      this.lr = 0
+      this.lr=((this.wantmoney-(this.cb-mdfy))*(1-0.187-Number(this.kickback))-mdfy)*1.45
+      //利润率
+      this.lrl = 0
+      this.lrl= this.lr/(Number(this.money)+Number(tc)+Number(sjf)*7.5)
+      this.sc=''
+      this.sc='产品的成本定价是'+this.cb.toFixed(2)+',产品的利润是'+this.lr.toFixed(2)+',产品的利润率是'+this.lrl.toFixed(2)
+      this.cs=''
+      if(this.optionvalue[1]=='bfc_ky1'||this.optionvalue[1]=='bfc_ky2'||this.optionvalue[1]=='bfc_kh1'||this.optionvalue[1]=='bfc_kh2'||this.optionvalue[1]=='bfc_tl1'||this.optionvalue[1]=='bfc_tl2'){
+              this.cs='产品的采购价格是'+this.money+'产品的计费重是'+c+',头程费用是'+tc.toFixed(2)+',上架费是'+sjf+'欧元,拣货费是'+jhf+'欧元,贴标费是'+tbf+'欧元,物料费是'+wlf+'欧元,运费是'+spyf+',产品佣金是'+this.kickback+',面单费用'+mdfy
+}else    if(this.optionvalue[1]=='gfc_ky1'||this.optionvalue[1]=='gfc_ky2'||this.optionvalue[1]=='gfc_kh1'||this.optionvalue[1]=='gfc_kh2'||this.optionvalue[1]=='gfc_tl1'||this.optionvalue[1]=='gfc_tl2'){
+              this.cs='产品的采购价格是'+this.money+'产品的计费重是'+c+',头程费用是'+tc.toFixed(2)+',仓库费用是'+gfc_ckfy+'波兰币,运费是'+gfc_spyf+'波兰币,产品佣金是'+this.kickback+',面单费用'+mdfy
+          }
+        let bgwl = ''
+        let bgck = ''
+        let bgkd = ''
+        if(item[0]=='tl'){
+          bgwl='铁路'
+        }else if(item[0]=='kh'){
+          bgwl='卡航'
+        }else if(item[0]=='ky'){
+          bgwl='空运'
+        }
+        if(item[1]=='bfc_ky1'||item[1]=='bfc_kh1'||item[1]=='bfc_tl1'){
+          bgck='百分仓 Smart'
+        }else if(item[1]=='bfc_ky2'||item[1]=='bfc_kh2'||item[1]=='bfc_tl2'){
+          bgck='百分仓 非Smart'
+        }else if(item[1]=='gfc_ky1'||item[1]=='gfc_kh1'||item[1]=='gfc_tl1'){
+          bgck='官方仓 Smart'
+        }else if(item[1]=='gfc_ky2'||item[1]=='gfc_kh2'||item[1]=='gfc_tl2'){
+          bgck='官方仓 非Smart'
+        }
+        if(item[2].charAt(0)=='I'){
+          bgkd='INPOST'
+        }else{
+          bgkd=item[2].substr(0, 3)
+        }
+        if(this.optionvalue[2].charAt(0)=='I'){
+        if(this.weight>25||big>64||mid>41||small>38){
+          this.cb= 0
+          this.lr= 0
+          this.lrl= 0
+        }
+      }
+        this.gridData.push({
+          bg1: bgwl,
+          bg2: bgck,
+          bg3: bgkd,
+          bg4: Number(this.cb.toFixed(2)),
+          bg5: Number(this.lr.toFixed(2)),
+          bg6: Number(this.lrl.toFixed(2))
+        })
+       })
+       this.sc=''
+       this.cs=''
+       this.optionvalue[0]=a1
+       this.optionvalue[1]=b1
+       this.optionvalue[2]=c1
+      },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      cx(){
+      //计算实际计费重量
+        let a = this.long*this.wide*this.high/6000
+        let b = this.weight
+        let c = 0
+        if(a>b){
+        c = a
+        }else if(a<=b){
+        c = b
+        }
+      //计算头程
+      //运输方式        this.optionvalue[0]
+      //仓库+是否smart  this.optionvalue[1]
+      //物流渠道        this.optionvalue[2]
+        let tc = 0
+      if(this.optionvalue[0]=='ky'){
+        tc = 50*c 
+      }else if(this.optionvalue[0]=='kh'){
+        tc = 30*c 
+      }else if(this.optionvalue[0]=='tl'){
+        tc = 20*c
+      }
+      //计算上架费
+      let sjf = 0 
+      if(c<1){
+        sjf = 0.2
+      }else if(1<=c&&c<2){
+        sjf = 0.5
+      }else if(2<=c&&c<5){
+        sjf = 1
+      }else if(5<=c&&c<10){
+        sjf = 1.6
+      }else if(10<=c&&c<15){
+        sjf = 2.2
+      }else if(15<=c&&c<20){
+        sjf = 2.8
+      }else if(20<=c&&c<30){
+        sjf = 3.6
+      }else if(30<=c&&c<40){
+        sjf = 4.6
+      }else if(40<c){
+        sjf = 6
+      }
+      //拣货费固定0.2 
+      let jhf = 0
+      if(c<1){
+        jhf = 0.2
+      }else if(1<=c&&c<2){
+        jhf = 0.5
+      }else if(2<=c&&c<3){
+        jhf = 0.8
+      }else if(3<=c&&c<4){
+        jhf = 1.2
+      }else if(4<=c&&c<5){
+        jhf = 1.6
+      }else if(5<=c){
+        jhf = 2
+      }
+      //计算贴标费
+      let tbf = 0.2
+      if(this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+          tbf = 0
+      }
+      //计算物料费
+      let wlf = 0 
+      if(c<0.2){
+        wlf = 0.3
+      }else if(0.2<=c&&c<1){
+        wlf = 0.5
+      }else if(1<=c&&c<2){
+        wlf = 1
+      }else if(2<=c&&c<5){
+        wlf = 1.5
+      }else if(5<=c&&c<10){
+        wlf = 2
+      }else if(10<=c&&c<20){
+        wlf = 2.5
+      }else if(20<=c&&c<31.5){
+        wlf = 3
+      }
+      //计算百分仓非smart商品运费
+      let spyf = 0
+      let big = 0
+      let mid = 0
+      let small = 0
+      this.long=Number(this.long)
+      this.wide=Number(this.wide)
+      this.high=Number(this.high)
+      if(this.long>=this.wide&&this.long>=this.high){
+          big = this.long
+          if(this.wide>=this.high){
+            mid=this.wide
+            small=this.high
+          }else{
+            mid=this.high
+            small=this.wide
+          }
+        }else if(this.wide>=this.long&&this.wide>=this.high){
+          big = this.wide
+          if(this.long>=this.high){
+            mid=this.long
+            small=this.high
+          }else{
+            mid=this.high
+            small=this.long
+          }
+        }else{
+          big = this.high
+          if(this.long>=this.wide){
+            mid=this.long
+            small=this.wide
+          }else{
+            mid=this.wide
+            small=this.long
+          }
+        }
+      if (this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+        if(mid<=38&&small>0&&small<=8){
+          spyf=3.1
+        }else if(mid<=38&&small>8&&small<=19){
+          spyf=3.25
+        }else{
+          spyf=3.75
+        }
+      }
+    
+      if (this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'){
+        if(0<c&&c<=2){
+          spyf=4
+        }else if(2<c&&c<=5){
+          spyf=4.3
+        }else if(5<c&&c<=10){
+          spyf=4.6
+        }else if(10<c&&c<=15){
+          spyf=5
+        }else if(15<c&&c<=20){
+          spyf=5.55
+        }else if(20<c&&c<=31.5){
+          spyf=6.1
+        }else if(31.5<c&&c<=40){
+          spyf=31.5
+        }
+      }
+      if (this.optionvalue[2]=='DHL_kyb2'||this.optionvalue[2]=='DHL_khb2'||this.optionvalue[2]=='DHL_khb2'
+    ){
+        spyf=2.898
+          //14.99波兰币
+      }
+      if (this.optionvalue[2]=='DPD_kyb2'||this.optionvalue[2]=='DPD_khb2'||this.optionvalue[2]=='DPD_khb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      if (this.optionvalue[2]=='UPS_kyb2'||this.optionvalue[2]=='UPS_khb2'||this.optionvalue[2]=='UPS_khb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      if (this.optionvalue[2]=='One_kyb2'||this.optionvalue[2]=='One_khb2'||this.optionvalue[2]=='One_khb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      let gfc_ckfy=0
+      let lfm=this.long*this.wide*this.high/1000000
+
+      if (0<lfm&&lfm<0.0003){
+        gfc_ckfy=3.06
+      }else if(0.0003<lfm&&lfm<=0.001){
+        gfc_ckfy=4.91
+      }else if(0.001<lfm&&lfm<=0.003){
+        gfc_ckfy=6.14
+      }else if(0.003<lfm&&lfm<=0.015){
+        gfc_ckfy=8.6
+      }else if(0.015<lfm&&lfm<=0.031){
+        gfc_ckfy=9.83
+      }else if(0.031<lfm&&lfm<=0.0768){
+        gfc_ckfy=12.9
+      }
+
+      let gfc_spyf=0
+      if (this.optionvalue[2]=='InPost_kyg2'||this.optionvalue[2]=='InPost_khg2'||this.optionvalue[2]=='InPost_tlg2'){
+        gfc_spyf=10.95
+      }
+      if (this.optionvalue[2]=='GLS_kyg2'||this.optionvalue[2]=='GLS_khg2'||this.optionvalue[2]=='GLS_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='DHL_kyg2'||this.optionvalue[2]=='DHL_khg2'||this.optionvalue[2]=='DHL_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='DPD_kyg2'||this.optionvalue[2]=='DPD_khg2'||this.optionvalue[2]=='DPD_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='UPS_kyg2'||this.optionvalue[2]=='UPS_khg2'||this.optionvalue[2]=='UPS_tlg2'){
+        gfc_spyf=14.99
+      }
+      if (this.optionvalue[2]=='Onekyg2'||this.optionvalue[2]=='One_khg2'||this.optionvalue[2]=='One_tlg2'){
+        gfc_spyf=9.99
+      }
+      let mdfy = 0
+      if(this.optionvalue[2]=='InPost_kyg1'||this.optionvalue[2]=='InPost_khg1'||this.optionvalue[2]=='InPost_tlg1'||this.optionvalue[2]=='InPost_kyb1'||this.optionvalue[2]=='InPost_khb1'||this.optionvalue[2]=='InPost_tlb1'){
+          if(this.wantmoney>=40&&this.wantmoney<50){
+          mdfy=1.59
+        }
+        else if(this.wantmoney>=50&&this.wantmoney<60){
+          mdfy=2.09
+        }
+        else if(this.wantmoney>=60&&this.wantmoney<80){   
+          mdfy=2.89
+        }else if(this.wantmoney>=80&&this.wantmoney<120){
+          mdfy=3.99
+        }else if(this.wantmoney>=120&&this.wantmoney<200){
+          mdfy=6.69
+        }else if(200<=this.wantmoney){
+          mdfy=8.69
+        }
+      }
+        if(this.optionvalue[2]=='DPD_kyg1'||this.optionvalue[2]=='DPD_khg1'||this.optionvalue[2]=='DPD_tlg1'||this.optionvalue[2]=='DPD_kyb1'||this.optionvalue[2]=='DPD_khb1'||this.optionvalue[2]=='DPD_tlb1'
+        ||this.optionvalue[2]=='DHL_kyg1'||this.optionvalue[2]=='DHL_khg1'||this.optionvalue[2]=='DHL_tlg1'||this.optionvalue[2]=='DHL_kyb1'||this.optionvalue[2]=='DHL_khb1'||this.optionvalue[2]=='DHL_tlb1'
+        ||this.optionvalue[2]=='GLS_kyg1'||this.optionvalue[2]=='GLS_khg1'||this.optionvalue[2]=='GLS_tlg1'||this.optionvalue[2]=='GLS_kyb1'||this.optionvalue[2]=='GLS_khb1'||this.optionvalue[2]=='GLS_tlb1'
+        ||this.optionvalue[2]=='UPS_kyg1'||this.optionvalue[2]=='UPS_khg1'||this.optionvalue[2]=='UPS_tlg1'||this.optionvalue[2]=='UPS_kyb1'||this.optionvalue[2]=='UPS_khb1'||this.optionvalue[2]=='UPS_tlb1'){
+        if(40<=this.wantmoney&&this.wantmoney<80){ 
+          mdfy=3.49
+        }else if(80<=this.wantmoney&&this.wantmoney<120){
+          mdfy=5.09
+        }
+        else if(120<=this.wantmoney&&this.wantmoney<200){
+          mdfy=8.69
+        }else if(200<=this.wantmoney){
+          mdfy=11.49
+        }
+      }
+      if(this.optionvalue[2]=='One_kyg1'||this.optionvalue[2]=='One_khg1'||this.optionvalue[2]=='One_tlg1'||this.optionvalue[2]=='One_kyb1'||this.optionvalue[2]=='One_khb1'||this.optionvalue[2]=='One_tlb1'){
+        if(40<=this.wantmoney&&this.wantmoney<49.99){ 
+          mdfy=1.29
+        }else if(50<=this.wantmoney&&this.wantmoney<59.99){
+          mdfy=1.69
+        }else if(60<=this.wantmoney&&this.wantmoney<79.99){
+          mdfy=2.29
+        }else if(80<=this.wantmoney&&this.wantmoney<119.99){
+          mdfy=3.29
+        }else if(120<=this.wantmoney&&this.wantmoney<199.99){
+          mdfy=5.99
+        }else if(200<=this.wantmoney){
+          mdfy=6.49
+        }
+      }
+      //成本定价 波兰币
+      this.cb = 0
+      if(this.optionvalue[1]=='bfc_ky1'||this.optionvalue[1]=='bfc_ky2'||this.optionvalue[1]=='bfc_kh1'||this.optionvalue[1]=='bfc_kh2'||this.optionvalue[1]=='bfc_tl1'||this.optionvalue[1]=='bfc_tl2'){
+        this.cb = (Number(this.money)+Number(tc)+(Number(sjf)+Number(jhf)+0.2+Number(wlf)+Number(spyf))*7.5)/(1-0.187-Number(this.kickback))/1.45+mdfy
+      }
+      else  if(this.optionvalue[1]=='gfc_ky1'||this.optionvalue[1]=='gfc_ky2'||this.optionvalue[1]=='gfc_kh1'||this.optionvalue[1]=='gfc_kh2'||this.optionvalue[1]=='gfc_tl1'||this.optionvalue[1]=='gfc_tl2'){
+        this.cb = (Number(this.money)+Number(tc)+(Number(gfc_ckfy)+gfc_spyf)*1.45)/(1-0.187-Number(this.kickback))/1.45+mdfy
+      }
+      //利润 人民币
+      this.lr = 0
+      this.lr=((this.wantmoney-(this.cb-mdfy))*(1-0.187-Number(this.kickback))-mdfy)*1.45
+      //利润率
+      this.lrl = 0
+      this.lrl= this.lr/(Number(this.money)+Number(tc)+Number(sjf)*7.5)
+      this.sc=''
+      this.sc='产品的成本定价是'+this.cb.toFixed(2)+',产品的利润是'+this.lr.toFixed(2)+',产品的利润率是'+this.lrl.toFixed(2)
+      this.cs=''
+      if(this.optionvalue[1]=='bfc_ky1'||this.optionvalue[1]=='bfc_ky2'||this.optionvalue[1]=='bfc_kh1'||this.optionvalue[1]=='bfc_kh2'||this.optionvalue[1]=='bfc_tl1'||this.optionvalue[1]=='bfc_tl2'){
+              this.cs='产品的采购价格是'+this.money+'产品的计费重是'+c+',头程费用是'+tc.toFixed(2)+',上架费是'+sjf+'欧元,拣货费是'+jhf+'欧元,贴标费是'+tbf+'欧元,物料费是'+wlf+'欧元,运费是'+spyf+',产品佣金是'+this.kickback+',面单费用'+mdfy
+}else    if(this.optionvalue[1]=='gfc_ky1'||this.optionvalue[1]=='gfc_ky2'||this.optionvalue[1]=='gfc_kh1'||this.optionvalue[1]=='gfc_kh2'||this.optionvalue[1]=='gfc_tl1'||this.optionvalue[1]=='gfc_tl2'){
+              this.cs='产品的采购价格是'+this.money+'产品的计费重是'+c+',头程费用是'+tc.toFixed(2)+',仓库费用是'+gfc_ckfy+'波兰币,运费是'+gfc_spyf+'波兰币,产品佣金是'+this.kickback+',面单费用'+mdfy
+          }
+        if(this.optionvalue[2].charAt(0)=='I'){
+        if(this.weight>25||big>64||mid>41||small>38){
+          alert('请注意:该产品无法放入INPOST储物柜')
+        }
+      }
+      },
+      }
+    })
+  </script>
+</html>
+
+
+        
+  
