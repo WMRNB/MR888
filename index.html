@@ -797,6 +797,7 @@
         }
       },
       cxqb(){
+        this.gridData=[]
         this.dialogTableVisible = true
         let a1 = this.optionvalue[0]
         let b1 = this.optionvalue[1]
@@ -806,8 +807,8 @@
         this.optionvalue[1]=item[1]
         this.optionvalue[2]=item[2]
        //计算实际计费重量
-       let a = this.long*this.wide*this.high/6000
-        let b = this.weight
+        let a = Number(this.long)*Number(this.wide)*Number(this.high)/6000
+        let b = Number(this.weight)
         let c = 0
         if(a>b){
         c = a
@@ -864,7 +865,8 @@
       }
       //计算贴标费
       let tbf = 0.2
-      if(this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+      if(this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_tlb2'
+      ||this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_tlb2'){
           tbf = 0
       }
       //计算物料费
@@ -885,7 +887,7 @@
         wlf = 3
       }
     //计算百分仓非smart商品运费
-    let spyf = 0
+      let spyf = 0
       let big = 0
       let mid = 0
       let small = 0
@@ -920,7 +922,7 @@
             small=this.long
           }
         }
-      if (this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+      if (this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_tlb2'){
         if(mid<=38&&small>0&&small<=8){
           spyf=3.1
         }else if(mid<=38&&small>8&&small<=19){
@@ -929,7 +931,7 @@
           spyf=3.75
         }
       }
-      if (this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'){
+      if (this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_tlb2'){
         if(0<c&&c<=2){
           spyf=4
         }else if(2<c&&c<=5){
@@ -946,24 +948,24 @@
           spyf=31.5
         }
       }
-      if (this.optionvalue[2]=='DHL_kyb2'||this.optionvalue[2]=='DHL_khb2'||this.optionvalue[2]=='DHL_khb2'){
+      if (this.optionvalue[2]=='DHL_kyb2'||this.optionvalue[2]=='DHL_khb2'||this.optionvalue[2]=='DHL_tlb2'){
           spyf=2.898
           //14.99波兰币
       }
-      if (this.optionvalue[2]=='DPD_kyb2'||this.optionvalue[2]=='DPD_khb2'||this.optionvalue[2]=='DPD_khb2'){
+      if (this.optionvalue[2]=='DPD_kyb2'||this.optionvalue[2]=='DPD_khb2'||this.optionvalue[2]=='DPD_tlb2'){
           spyf=2.898
           //14.99波兰币
       }
-      if (this.optionvalue[2]=='UPS_kyb2'||this.optionvalue[2]=='UPS_khb2'||this.optionvalue[2]=='UPS_khb2'){
+      if (this.optionvalue[2]=='UPS_kyb2'||this.optionvalue[2]=='UPS_khb2'||this.optionvalue[2]=='UPS_tlb2'){
           spyf=2.898
           //14.99波兰币
       }
-      if (this.optionvalue[2]=='One_kyb2'||this.optionvalue[2]=='One_khb2'||this.optionvalue[2]=='One_khb2'){
+      if (this.optionvalue[2]=='One_kyb2'||this.optionvalue[2]=='One_khb2'||this.optionvalue[2]=='One_tlb2'){
           spyf=2.898
           //14.99波兰币
       }
       let gfc_ckfy=0
-      let lfm=this.long*this.wide*this.high/1000000
+      let lfm=Number(this.long)*Number(this.wide)*Number(this.high)/1000000
 
       if (0<lfm&&lfm<0.0003){
         gfc_ckfy=3.06
@@ -995,11 +997,12 @@
       if (this.optionvalue[2]=='UPS_kyg2'||this.optionvalue[2]=='UPS_khg2'||this.optionvalue[2]=='UPS_tlg2'){
         gfc_spyf=14.99
       }
-      if (this.optionvalue[2]=='Onekyg2'||this.optionvalue[2]=='One_khg2'||this.optionvalue[2]=='One_tlg2'){
+      if (this.optionvalue[2]=='One_kyg2'||this.optionvalue[2]=='One_khg2'||this.optionvalue[2]=='One_tlg2'){
         gfc_spyf=9.99
       }
       let mdfy = 0
-      if(this.optionvalue[2]=='InPost_kyg1'||this.optionvalue[2]=='InPost_khg1'||this.optionvalue[2]=='InPost_tlg1'||this.optionvalue[2]=='InPost_kyb1'||this.optionvalue[2]=='InPost_khb1'||this.optionvalue[2]=='InPost_tlb1'){
+      if(this.optionvalue[2]=='InPost_kyg1'||this.optionvalue[2]=='InPost_khg1'||this.optionvalue[2]=='InPost_tlg1'
+        ||this.optionvalue[2]=='InPost_kyb1'||this.optionvalue[2]=='InPost_khb1'||this.optionvalue[2]=='InPost_tlb1'){
           if(this.wantmoney>=40&&this.wantmoney<50){
           mdfy=1.59
         }
@@ -1060,14 +1063,6 @@
       //利润率
       this.lrl = 0
       this.lrl= this.lr/(Number(this.money)+Number(tc)+Number(sjf)*7.5)
-      this.sc=''
-      this.sc='产品的成本定价是'+this.cb.toFixed(2)+',产品的利润是'+this.lr.toFixed(2)+',产品的利润率是'+this.lrl.toFixed(2)
-      this.cs=''
-      if(this.optionvalue[1]=='bfc_ky1'||this.optionvalue[1]=='bfc_ky2'||this.optionvalue[1]=='bfc_kh1'||this.optionvalue[1]=='bfc_kh2'||this.optionvalue[1]=='bfc_tl1'||this.optionvalue[1]=='bfc_tl2'){
-              this.cs='产品的采购价格是'+this.money+'产品的计费重是'+c+',头程费用是'+tc.toFixed(2)+',上架费是'+sjf+'欧元,拣货费是'+jhf+'欧元,贴标费是'+tbf+'欧元,物料费是'+wlf+'欧元,运费是'+spyf+',产品佣金是'+this.kickback+',面单费用'+mdfy
-}else    if(this.optionvalue[1]=='gfc_ky1'||this.optionvalue[1]=='gfc_ky2'||this.optionvalue[1]=='gfc_kh1'||this.optionvalue[1]=='gfc_kh2'||this.optionvalue[1]=='gfc_tl1'||this.optionvalue[1]=='gfc_tl2'){
-              this.cs='产品的采购价格是'+this.money+'产品的计费重是'+c+',头程费用是'+tc.toFixed(2)+',仓库费用是'+gfc_ckfy+'波兰币,运费是'+gfc_spyf+'波兰币,产品佣金是'+this.kickback+',面单费用'+mdfy
-          }
         let bgwl = ''
         let bgck = ''
         let bgkd = ''
@@ -1151,8 +1146,8 @@
 
       cx(){
       //计算实际计费重量
-        let a = this.long*this.wide*this.high/6000
-        let b = this.weight
+        let a = Number(this.long)*Number(this.wide)*Number(this.high)/6000
+        let b = Number(this.weight)
         let c = 0
         if(a>b){
         c = a
@@ -1209,7 +1204,8 @@
       }
       //计算贴标费
       let tbf = 0.2
-      if(this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+      if(this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_tlg2'
+      ||this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_tlb2'){
           tbf = 0
       }
       //计算物料费
@@ -1265,7 +1261,7 @@
             small=this.long
           }
         }
-      if (this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_khb2'){
+      if (this.optionvalue[2]=='InPost_kyb2'||this.optionvalue[2]=='InPost_khb2'||this.optionvalue[2]=='InPost_tlb2'){
         if(mid<=38&&small>0&&small<=8){
           spyf=3.1
         }else if(mid<=38&&small>8&&small<=19){
@@ -1275,7 +1271,7 @@
         }
       }
     
-      if (this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_khb2'){
+      if (this.optionvalue[2]=='GLS_kyb2'||this.optionvalue[2]=='GLS_khb2'||this.optionvalue[2]=='GLS_tlb2'){
         if(0<c&&c<=2){
           spyf=4
         }else if(2<c&&c<=5){
@@ -1292,25 +1288,24 @@
           spyf=31.5
         }
       }
-      if (this.optionvalue[2]=='DHL_kyb2'||this.optionvalue[2]=='DHL_khb2'||this.optionvalue[2]=='DHL_khb2'
-    ){
-        spyf=2.898
-          //14.99波兰币
-      }
-      if (this.optionvalue[2]=='DPD_kyb2'||this.optionvalue[2]=='DPD_khb2'||this.optionvalue[2]=='DPD_khb2'){
+      if (this.optionvalue[2]=='DHL_kyb2'||this.optionvalue[2]=='DHL_khb2'||this.optionvalue[2]=='DHL_tlb2'){
           spyf=2.898
           //14.99波兰币
       }
-      if (this.optionvalue[2]=='UPS_kyb2'||this.optionvalue[2]=='UPS_khb2'||this.optionvalue[2]=='UPS_khb2'){
+      if (this.optionvalue[2]=='DPD_kyb2'||this.optionvalue[2]=='DPD_khb2'||this.optionvalue[2]=='DPD_tlb2'){
           spyf=2.898
           //14.99波兰币
       }
-      if (this.optionvalue[2]=='One_kyb2'||this.optionvalue[2]=='One_khb2'||this.optionvalue[2]=='One_khb2'){
+      if (this.optionvalue[2]=='UPS_kyb2'||this.optionvalue[2]=='UPS_khb2'||this.optionvalue[2]=='UPS_tlb2'){
+          spyf=2.898
+          //14.99波兰币
+      }
+      if (this.optionvalue[2]=='One_kyb2'||this.optionvalue[2]=='One_khb2'||this.optionvalue[2]=='One_tlb2'){
           spyf=2.898
           //14.99波兰币
       }
       let gfc_ckfy=0
-      let lfm=this.long*this.wide*this.high/1000000
+      let lfm=Number(this.long)*Number(this.wide)*Number(this.high)/1000000
 
       if (0<lfm&&lfm<0.0003){
         gfc_ckfy=3.06
@@ -1342,7 +1337,7 @@
       if (this.optionvalue[2]=='UPS_kyg2'||this.optionvalue[2]=='UPS_khg2'||this.optionvalue[2]=='UPS_tlg2'){
         gfc_spyf=14.99
       }
-      if (this.optionvalue[2]=='Onekyg2'||this.optionvalue[2]=='One_khg2'||this.optionvalue[2]=='One_tlg2'){
+      if (this.optionvalue[2]=='One_kyg2'||this.optionvalue[2]=='One_khg2'||this.optionvalue[2]=='One_tlg2'){
         gfc_spyf=9.99
       }
       let mdfy = 0
