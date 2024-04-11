@@ -8,7 +8,7 @@
 <body>
   <div id="app">
     <div>
-    <el-descriptions class="margin-top" title="价格计算表" :column="3" :size="size"  border>
+    <el-descriptions class="margin-top" title="产品价格计算表" :column="3" :size="size"  border>
       <template slot="extra">
         <el-button type="primary" size="small" @click="pd1">查询单个</el-button>
         <el-button type="primary" size="small" @click="pd2">查询全部</el-button>
@@ -57,8 +57,9 @@
       </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">
-          <i class="el-icon-money"></i>
+          <i class="el-icon-money" ></i>
           产品佣金
+             <a href="https://allegro.pl/moje-allegro/sprzedaz/kalkulator-oplat?">（查询佣金）</a>
         </template>
         <el-input  v-model="kickback" placeholder="请输入产品佣金"></el-input>
       </el-descriptions-item>
@@ -821,7 +822,7 @@
       //物流渠道        this.optionvalue[2]
         let tc = 0
       if(this.optionvalue[0]=='ky'){
-        tc = 50*c 
+        tc = 60*c 
       }else if(this.optionvalue[0]=='kh'){
         tc = 30*c 
       }else if(this.optionvalue[0]=='tl'){
@@ -1160,7 +1161,7 @@
       //物流渠道        this.optionvalue[2]
         let tc = 0
       if(this.optionvalue[0]=='ky'){
-        tc = 50*c 
+        tc = 60*c 
       }else if(this.optionvalue[0]=='kh'){
         tc = 30*c 
       }else if(this.optionvalue[0]=='tl'){
